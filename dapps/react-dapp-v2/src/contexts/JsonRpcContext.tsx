@@ -38,6 +38,7 @@ import {
   DEFAULT_ELROND_METHODS,
   DEFAULT_TRON_METHODS,
   DEFAULT_TEZOS_METHODS,
+  DEFAULT_BCH_METHODS,
 } from "../constants";
 import { useChainData } from "./ChainDataContext";
 import { rpcProvidersByChainId } from "../../src/helpers/api";
@@ -106,6 +107,11 @@ interface IContext {
     testSignMessage: TRpcRequestCallback;
     testSignTransaction: TRpcRequestCallback;
   };
+  bchRpc: {
+    testGetAddresses: TRpcRequestCallback;
+    testSignTransaction: TRpcRequestCallback;
+    testSignMessage: TRpcRequestCallback;
+  }
   rpcResult?: IFormattedRpcResponse | null;
   isRpcRequestPending: boolean;
   isTestnet: boolean;
@@ -1265,6 +1271,107 @@ export function JsonRpcContextProvider({
     ),
   };
 
+  // -------- BCH RPC METHODS --------
+
+  const bchRpc = {
+    testGetAddresses: _createJsonRpcRequestHandler(
+      async (
+        chainId: string,
+        address: string
+      ): Promise<IFormattedRpcResponse> => {
+        try {
+          const result = await client!.request<{ signature: string }>({
+            chainId,
+            topic: session!.topic,
+            request: {
+              method: DEFAULT_BCH_METHODS.BCH_GET_ADDRESSES,
+              params: {},
+            },
+          });
+
+          return {
+            method: DEFAULT_BCH_METHODS.BCH_GET_ADDRESSES,
+            address,
+            valid: true,
+            result: JSON.stringify(result, null, 2),
+          };
+        } catch (error: any) {
+          throw new Error(error.message);
+        }
+      }
+    ),
+    testSignTransaction: _createJsonRpcRequestHandler(
+      async (
+        chainId: string,
+        address: string
+      ): Promise<IFormattedRpcResponse> => {
+        try {
+          console.log(1)
+          const result = await client!.request<{ hash: string }>({
+            chainId,
+            topic: session!.topic,
+            request: {
+              method: DEFAULT_BCH_METHODS.BCH_SIGN_TRANSACTION,
+              params: {
+                account: address,
+                operations: [
+                  {
+                    kind: "transaction",
+                    amount: "1", // 1 mutez, smallest unit
+                    destination: address, // send to ourselves
+                  },
+                ],
+              },
+            },
+          });
+          console.log(2, result)
+
+          return {
+            method: DEFAULT_BCH_METHODS.BCH_SIGN_TRANSACTION,
+            address,
+            valid: true,
+            result: result.hash,
+          };
+        } catch (error: any) {
+          console.log(3, error)
+          throw new Error(error.message);
+        }
+      }
+    ),
+    testSignMessage: _createJsonRpcRequestHandler(
+      async (
+        chainId: string,
+        address: string
+      ): Promise<IFormattedRpcResponse> => {
+        const payload = "05010000004254";
+
+        try {
+          const result = await client!.request<string>({
+            chainId,
+            topic: session!.topic,
+            request: {
+              method: DEFAULT_BCH_METHODS.BCH_SIGN_MESSAGE,
+              params: {
+                address: address,
+                message: payload,
+              },
+            },
+          });
+          console.log(11, result)
+
+          return {
+            method: DEFAULT_BCH_METHODS.BCH_SIGN_MESSAGE,
+            address,
+            valid: true,
+            result: result,
+          };
+        } catch (error: any) {
+          throw new Error(error.message);
+        }
+      }
+    ),
+  };
+
   return (
     <JsonRpcContext.Provider
       value={{
@@ -1277,6 +1384,7 @@ export function JsonRpcContextProvider({
         elrondRpc,
         tronRpc,
         tezosRpc,
+        bchRpc,
         rpcResult: result,
         isRpcRequestPending: pending,
         isTestnet,

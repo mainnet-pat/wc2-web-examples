@@ -15,6 +15,7 @@ export const DEFAULT_MAIN_CHAINS = [
   "elrond:1",
   "tron:0x2b6653dc",
   "tezos:mainnet",
+  "bch:bitcoincash",
 ];
 
 export const DEFAULT_TEST_CHAINS = [
@@ -30,6 +31,7 @@ export const DEFAULT_TEST_CHAINS = [
   "elrond:D",
   "tron:0xcd8690dc",
   "tezos:testnet",
+  "bch:bchtest",
 ];
 
 export const DEFAULT_CHAINS = [...DEFAULT_MAIN_CHAINS, ...DEFAULT_TEST_CHAINS];
@@ -137,6 +139,19 @@ export enum DEFAULT_TEZOS_METHODS {
 }
 
 export enum DEFAULT_TEZOS_EVENTS {}
+
+/**
+ * BCH
+ */
+export enum DEFAULT_BCH_METHODS {
+  BCH_GET_ADDRESSES = "bch_getAddresses",
+  BCH_SIGN_TRANSACTION = "bch_signTransaction",
+  BCH_SIGN_MESSAGE = "bch_signMessage",
+}
+
+export enum DEFAULT_BCH_EVENTS {
+  BCH_ADDRESSES_CHANGED = "addressesChanged",
+}
 
 export const DEFAULT_GITHUB_REPO_URL =
   "https://github.com/WalletConnect/web-examples/tree/main/dapps/react-dapp-v2";

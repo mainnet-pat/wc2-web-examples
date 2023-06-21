@@ -18,6 +18,7 @@ import {
   DEFAULT_NEAR_METHODS,
   DEFAULT_TRON_METHODS,
   DEFAULT_TEZOS_METHODS,
+  DEFAULT_BCH_METHODS,
 } from "../constants";
 import { AccountAction, setLocaleStorageTestnetFlag } from "../helpers";
 import Toggle from "../components/Toggle";
@@ -77,6 +78,7 @@ const Home: NextPage = () => {
     elrondRpc,
     tronRpc,
     tezosRpc,
+    bchRpc,
     isRpcRequestPending,
     rpcResult,
     isTestnet,
@@ -115,10 +117,19 @@ const Home: NextPage = () => {
       throw new Error("WalletConnect is not initialized");
     }
 
-    await client.emit({
-      topic: session?.topic || "",
-      event: { name: "chainChanged", data: {} },
-      chainId: "eip155:5",
+    // await client.emit({
+    //   topic: session?.topic || "",
+    //   event: { name: "chainChanged", data: {} },
+    //   chainId: "eip155:5",
+    // });
+
+    const signature = await client!.request<string>({
+      topic: session!.topic,
+      chainId: "bch:mainnet",
+      request: {
+        method: "bch_sign", //DEFAULT_EIP155_METHODS.PERSONAL_SIGN,
+        params: ["asdf"],
+      },
     });
   }
 
@@ -337,6 +348,35 @@ const Home: NextPage = () => {
     ];
   };
 
+  const getBchActions = (): AccountAction[] => {
+    const onGetAccounts = async (chainId: string, address: string) => {
+      openRequestModal();
+      await bchRpc.testGetAddresses(chainId, address);
+    };
+    const onSignTransaction = async (chainId: string, address: string) => {
+      openRequestModal();
+      await bchRpc.testSignTransaction(chainId, address);
+    };
+    const onSignMessage = async (chainId: string, address: string) => {
+      openRequestModal();
+      await bchRpc.testSignMessage(chainId, address);
+    };
+    return [
+      {
+        method: DEFAULT_BCH_METHODS.BCH_GET_ADDRESSES,
+        callback: onGetAccounts,
+      },
+      {
+        method: DEFAULT_BCH_METHODS.BCH_SIGN_TRANSACTION,
+        callback: onSignTransaction,
+      },
+      {
+        method: DEFAULT_BCH_METHODS.BCH_SIGN_MESSAGE,
+        callback: onSignMessage,
+      },
+    ];
+  };
+
   const getBlockchainActions = (chainId: string) => {
     const [namespace] = chainId.split(":");
     switch (namespace) {
@@ -356,6 +396,8 @@ const Home: NextPage = () => {
         return getTronActions();
       case "tezos":
         return getTezosActions();
+      case "bch":
+        return getBchActions();
       default:
         break;
     }
@@ -430,7 +472,10 @@ const Home: NextPage = () => {
         <h3>Accounts</h3>
         <SAccounts>
           {accounts.map((account) => {
-            const [namespace, reference, address] = account.split(":");
+            let [namespace, reference, address] = account.split(":");
+            if (namespace === "bch") {
+              address = [reference, address].join(":");
+            }
             const chainId = `${namespace}:${reference}`;
             return (
               <Blockchain

@@ -12,6 +12,7 @@ interface RequestModalProps {
 
 const RequestModal = (props: RequestModalProps) => {
   const { pending, result } = props;
+  console.log(props)
   return (
     <>
       {pending ? (
