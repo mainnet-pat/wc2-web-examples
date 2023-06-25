@@ -1306,25 +1306,142 @@ export function JsonRpcContextProvider({
         address: string
       ): Promise<IFormattedRpcResponse> => {
         try {
-          console.log(1)
           const result = await client!.request<{ hash: string }>({
             chainId,
             topic: session!.topic,
             request: {
               method: DEFAULT_BCH_METHODS.BCH_SIGN_TRANSACTION,
               params: {
-                account: address,
-                operations: [
+                "transaction": {
+                  "inputs": [
+                    {
+                      "outpointIndex": 0,
+                      "outpointTransactionHash": "<Uint8Array: 0xe9aa3a136fb47adf826f78220b1bcc41e0920ee87dd9394513519192137046db>",
+                      "sequenceNumber": 4294967294,
+                      "unlockingBytecode": "<Uint8Array: 0x004ce85414c3a3bdec377fd2757fa25596150ea78defc14f4d540390d0035479009c6300ce827701219d5379547a9dc3529d00cd00c78800d100ce8800cc00c65279939d00cf527f7781768b537aa16900d202feed52798b52807e8800d3009d02e80351cc789d51cd51c78851d3009d51d101207f7500ce01207f758851d27b52808802200351c6537a947c947c94760222029f63c4529d6751c752cd788852cc52799dc4539d52d181009d75686d755167547a519d5479a953798871adc3519d00ce8277009e6300cd00c78800d100ce8800cc02e8039d51cd0376a91454797e0288ac7e88686d6d5168>"
+                    },
+                    {
+                      "outpointIndex": 2,
+                      "outpointTransactionHash": "<Uint8Array: 0xe9aa3a136fb47adf826f78220b1bcc41e0920ee87dd9394513519192137046db>",
+                      "sequenceNumber": 4294967294,
+                      "unlockingBytecode": "<Uint8Array: 0x>"
+                    }
+                  ],
+                  "locktime": 153432,
+                  "outputs": [
+                    {
+                      "lockingBytecode": "<Uint8Array: 0xa91469ba5a522337e2d59cc1a36bc25b1b4a2753075b87>",
+                      "token": {
+                        "amount": "<bigint: 0n>",
+                        "category": "<Uint8Array: 0x9ec9f55af7ac914da2b272809abbbf51a848648c4555d144529cf150c58e2682>",
+                        "nft": {
+                          "capability": "minting",
+                          "commitment": "<Uint8Array: 0xfeed0200>"
+                        }
+                      },
+                      "valueSatoshis": "<bigint: 501000n>"
+                    },
+                    {
+                      "lockingBytecode": "<Uint8Array: 0x76a914c3a3bdec377fd2757fa25596150ea78defc14f4d88ac>",
+                      "token": {
+                        "amount": "<bigint: 0n>",
+                        "category": "<Uint8Array: 0x9ec9f55af7ac914da2b272809abbbf51a848648c4555d144529cf150c58e2682>",
+                        "nft": {
+                          "capability": "none",
+                          "commitment": "<Uint8Array: 0x0100>"
+                        }
+                      },
+                      "valueSatoshis": "<bigint: 1000n>"
+                    },
+                    {
+                      "lockingBytecode": "<Uint8Array: 0x76a914c3a3bdec377fd2757fa25596150ea78defc14f4d88ac>",
+                      "valueSatoshis": "<bigint: 9601207n>"
+                    }
+                  ],
+                  "version": 2
+                },
+                "sourceOutputs": [
                   {
-                    kind: "transaction",
-                    amount: "1", // 1 mutez, smallest unit
-                    destination: address, // send to ourselves
+                    "outpointIndex": 0,
+                    "outpointTransactionHash": "<Uint8Array: 0xe9aa3a136fb47adf826f78220b1bcc41e0920ee87dd9394513519192137046db>",
+                    "sequenceNumber": 4294967294,
+                    "unlockingBytecode": "<Uint8Array: 0x004ce85414c3a3bdec377fd2757fa25596150ea78defc14f4d540390d0035479009c6300ce827701219d5379547a9dc3529d00cd00c78800d100ce8800cc00c65279939d00cf527f7781768b537aa16900d202feed52798b52807e8800d3009d02e80351cc789d51cd51c78851d3009d51d101207f7500ce01207f758851d27b52808802200351c6537a947c947c94760222029f63c4529d6751c752cd788852cc52799dc4539d52d181009d75686d755167547a519d5479a953798871adc3519d00ce8277009e6300cd00c78800d100ce8800cc02e8039d51cd0376a91454797e0288ac7e88686d6d5168>",
+                    "lockingBytecode": "<Uint8Array: 0xa91469ba5a522337e2d59cc1a36bc25b1b4a2753075b87>",
+                    "valueSatoshis": "<bigint: 251000n>",
+                    "token": {
+                      "category": "<Uint8Array: 0x9ec9f55af7ac914da2b272809abbbf51a848648c4555d144529cf150c58e2682>",
+                      "nft": {
+                        "capability": "minting",
+                        "commitment": "<Uint8Array: 0xfeed0100>"
+                      }
+                    },
+                    "contract": {
+                      "abiFunction": {
+                        "name": "mint",
+                        "inputs": []
+                      },
+                      "redeemScript": "<Uint8Array: 0x5414c3a3bdec377fd2757fa25596150ea78defc14f4d540390d0035479009c6300ce827701219d5379547a9dc3529d00cd00c78800d100ce8800cc00c65279939d00cf527f7781768b537aa16900d202feed52798b52807e8800d3009d02e80351cc789d51cd51c78851d3009d51d101207f7500ce01207f758851d27b52808802200351c6537a947c947c94760222029f63c4529d6751c752cd788852cc52799dc4539d52d181009d75686d755167547a519d5479a953798871adc3519d00ce8277009e6300cd00c78800d100ce8800cc02e8039d51cd0376a91454797e0288ac7e88686d6d5168>",
+                      "artifact": {
+                        "contractName": "MintingCovenant",
+                        "constructorInputs": [
+                          {
+                            "name": "mintCost",
+                            "type": "int"
+                          },
+                          {
+                            "name": "maxAmount",
+                            "type": "int"
+                          },
+                          {
+                            "name": "owner",
+                            "type": "bytes20"
+                          },
+                          {
+                            "name": "nonce",
+                            "type": "int"
+                          }
+                        ],
+                        "abi": [
+                          {
+                            "name": "mint",
+                            "inputs": []
+                          },
+                          {
+                            "name": "withdraw",
+                            "inputs": [
+                              {
+                                "name": "pk",
+                                "type": "pubkey"
+                              },
+                              {
+                                "name": "s",
+                                "type": "sig"
+                              }
+                            ]
+                          }
+                        ],
+                        "compiler": {
+                          "name": "cashc",
+                          "version": "0.8.0-next.2"
+                        },
+                        "updatedAt": "2023-06-25T06:53:19.192Z"
+                      }
+                    }
                   },
+                  {
+                    "outpointIndex": 2,
+                    "outpointTransactionHash": "<Uint8Array: 0xe9aa3a136fb47adf826f78220b1bcc41e0920ee87dd9394513519192137046db>",
+                    "sequenceNumber": 4294967294,
+                    "unlockingBytecode": "<Uint8Array: 0x>",
+                    "lockingBytecode": "<Uint8Array: 0x76a914c3a3bdec377fd2757fa25596150ea78defc14f4d88ac>",
+                    "valueSatoshis": "<bigint: 9853007n>"
+                  }
                 ],
+                "broadcast": false,
+                "userPrompt": "Mint new NFT"
               },
             },
           });
-          console.log(2, result)
 
           return {
             method: DEFAULT_BCH_METHODS.BCH_SIGN_TRANSACTION,
@@ -1333,11 +1450,11 @@ export function JsonRpcContextProvider({
             result: result.hash,
           };
         } catch (error: any) {
-          console.log(3, error)
           throw new Error(error.message);
         }
       }
     ),
+    
     testSignMessage: _createJsonRpcRequestHandler(
       async (
         chainId: string,
@@ -1370,6 +1487,7 @@ export function JsonRpcContextProvider({
         }
       }
     ),
+    
   };
 
   return (
