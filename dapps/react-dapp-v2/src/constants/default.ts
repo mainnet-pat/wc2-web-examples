@@ -16,6 +16,7 @@ export const DEFAULT_MAIN_CHAINS = [
   "tron:0x2b6653dc",
   "tezos:mainnet",
   "bch:bitcoincash",
+  "eip155:10000"
 ];
 
 export const DEFAULT_TEST_CHAINS = [

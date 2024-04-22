@@ -90,6 +90,14 @@ export const rpcProvidersByChainId: Record<number, any> = {
       symbol: "CELO",
     },
   },
+  10000: {
+    name: "smartBCH Mainnet",
+    baseURL: ["https://rpc.smartbch.org"],
+    token: {
+      name: "BCH",
+      symbol: "BCH",
+    },
+  },
 };
 
 const api: AxiosInstance = axios.create({

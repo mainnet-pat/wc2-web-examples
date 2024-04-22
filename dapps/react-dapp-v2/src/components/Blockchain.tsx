@@ -133,7 +133,6 @@ const Blockchain: FC<PropsWithChildren<BlockchainProps>> = (
   if (typeof chain === "undefined") return null;
 
   const name = chain.meta.name || chain.data.name;
-  console.log(address)
   const account =
     typeof address !== "undefined" ? `${chainId}:${address}` : undefined;
   const assets =

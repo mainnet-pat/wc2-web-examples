@@ -18,6 +18,7 @@ export const EIP155Colors = {
   polygon: "130, 71, 229",
   celo: "60, 203, 132",
   arbitrum: "44, 55, 75",
+  smartbch: "73, 169, 166"
 };
 
 export const EIP155ChainData: ChainsMap = {
@@ -112,6 +113,13 @@ export const EIP155ChainData: ChainsMap = {
     slip44: 60,
     testnet: true,
   },
+  "10000": {
+    name: "smartBCH Mainnet",
+    id: "eip155:10000",
+    rpc: ["https://rpc.smartbch.org"],
+    slip44: 60,
+    testnet: false,
+  }
 };
 
 export const EIP155Metadata: NamespaceMetadata = {
@@ -167,6 +175,10 @@ export const EIP155Metadata: NamespaceMetadata = {
   "421611": {
     logo: BLOCKCHAIN_LOGO_BASE_URL + "eip155:421611.png",
     rgb: EIP155Colors.arbitrum,
+  },
+  "10000": {
+    logo: "https://smartbch.org/favicon.png",
+    rgb: EIP155Colors.smartbch,
   },
 };
 export function getChainMetadata(chainId: string): ChainMetadata {

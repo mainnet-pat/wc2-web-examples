@@ -26,16 +26,16 @@ export const BchChainData: ChainsMap = {
   },
 };
 
-export const CosmosMetadata: NamespaceMetadata = {
+export const BchMetadata: NamespaceMetadata = {
   "bitcoincash": {
-    logo: BLOCKCHAIN_LOGO_BASE_URL + "cosmos:cosmoshub-4.png",
+    logo: "https://assets.coingecko.com/coins/images/780/small/bitcoin-cash-circle.png",
     rgb: "27, 31, 53",
   },
 };
 
 export function getChainMetadata(chainId: string): ChainMetadata {
   const reference = chainId.split(":")[1];
-  const metadata = CosmosMetadata[reference];
+  const metadata = BchMetadata[reference];
   if (typeof metadata === "undefined") {
     throw new Error(`No chain metadata found for chainId: ${chainId}`);
   }
