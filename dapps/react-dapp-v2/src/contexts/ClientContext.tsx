@@ -50,14 +50,49 @@ interface IContext {
  */
 export const ClientContext = createContext<IContext>({} as IContext);
 
-/**
- * Web3Modal Config
- */
-const web3Modal = new Web3Modal({
-  projectId: DEFAULT_PROJECT_ID,
-  themeMode: "light",
-  walletConnectVersion: 2,
-});
+const desktopWallets = {"xmr": [
+  {
+    id: "Monujo",
+    name: "Monujo",
+    links: {
+      native: undefined as any,
+      universal: "https://monujo.cash/#/wc"
+    },
+  },
+  {
+    id: "Monujo Local",
+    name: "Monujo Local",
+    links: {
+      native: undefined as any,
+      universal: "http://localhost:9000/#/wc"
+    },
+  },
+],
+"bch": [{
+  id: "Cashonize",
+  name: "Cashonize",
+  links: {
+    native: undefined as any,
+    universal: "https://cashonize.com/#/wc"
+  },
+},
+{
+  id: "Paytaca",
+  name: "Paytaca",
+  links: {
+    native: "",
+    universal: "chrome-extension://pakphhpnneopheifihmjcjnbdbhaaiaa/www/index.html#/apps/wallet-connect"
+  }
+},
+{
+  id: "Zapit",
+  name: "Zapit",
+  links: {
+    native: "",
+    universal: "chrome-extension://fccgmnglbhajioalokbcidhcaikhlcpm/index.html#/wallet-connect"
+  }
+},
+]};
 
 /**
  * Provider
@@ -138,6 +173,9 @@ export function ClientContextProvider({
         throw new Error("WalletConnect is not initialized");
       }
       console.log("connect, pairing topic is:", pairing?.topic);
+
+      let web3Modal!: Web3Modal;
+
       try {
         const requiredNamespaces = getRequiredNamespaces(chains);
         console.log(
@@ -148,6 +186,34 @@ export function ClientContextProvider({
         const { uri, approval } = await client.connect({
           pairingTopic: pairing?.topic,
           requiredNamespaces,
+        });
+
+        /**
+         * Web3Modal Config
+         */
+        const web3Modal = new Web3Modal({
+          // projectId: DEFAULT_PROJECT_ID,
+          // themeMode: "light",
+          // walletConnectVersion: 2,
+
+          projectId: DEFAULT_PROJECT_ID as any,
+          walletConnectVersion: 2,
+          desktopWallets: Object.keys(requiredNamespaces).reduce<any>(
+            (acc, namespace) => {
+              return [...acc, ...(desktopWallets as any)[namespace as any]];
+            },
+            []
+          ),
+          walletImages: {
+            "Cashonize": "https://cashonize.com/images/cashonize-icon.png",
+            "Paytaca": "https://www.paytaca.com/favicon.png",
+            "Zapit": "https://lh3.googleusercontent.com/DbMYirtFPzZhSky0djg575FGPAriqGUPokFcb8r0-3qdcgKfR8uLqwK0DCPn0XrrsijRNDUAKUVLXGqLWVcFBB8zDA=s120",
+            "Monujo": "https://monujo.cash/icons/monujo.icon.png",
+          },
+          enableExplorer: false,
+          enableAccountView: true,
+          mobileWallets: [],
+          explorerRecommendedWalletIds: "NONE",
         });
 
         // Open QRCode modal if a URI was returned (i.e. we're not connecting an existing pairing).
@@ -170,7 +236,7 @@ export function ClientContextProvider({
         // ignore rejection
       } finally {
         // close modal in case it was open
-        web3Modal.closeModal();
+        web3Modal?.closeModal();
       }
     },
     [chains, client, onSessionConnected]

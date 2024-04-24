@@ -26,6 +26,8 @@ import {
   getLocalStorageTestnetFlag,
   hashPersonalMessage,
   hashTypedDataMessage,
+  parseExtendedJson,
+  stringifyExtendedJson,
   verifySignature,
 } from "../helpers";
 import { useWalletConnectClient } from "./ClientContext";
@@ -39,6 +41,7 @@ import {
   DEFAULT_TRON_METHODS,
   DEFAULT_TEZOS_METHODS,
   DEFAULT_BCH_METHODS,
+  DEFAULT_XMR_METHODS,
 } from "../constants";
 import { useChainData } from "./ChainDataContext";
 import { rpcProvidersByChainId } from "../../src/helpers/api";
@@ -111,7 +114,15 @@ interface IContext {
     testGetAddresses: TRpcRequestCallback;
     testSignTransaction: TRpcRequestCallback;
     testSignMessage: TRpcRequestCallback;
-  }
+  };
+  xmrRpc: {
+    testGetAddresses: TRpcRequestCallback;
+    testSignTransaction: TRpcRequestCallback;
+    testSignMessage: TRpcRequestCallback;
+    testGetBalance: TRpcRequestCallback;
+    testGetUnlockedBalance: TRpcRequestCallback;
+    testGetBalances: TRpcRequestCallback;
+  };
   rpcResult?: IFormattedRpcResponse | null;
   isRpcRequestPending: boolean;
   isTestnet: boolean;
@@ -1490,6 +1501,205 @@ export function JsonRpcContextProvider({
     
   };
 
+  // -------- XMR RPC METHODS --------
+
+  const xmrRpc = {
+    testGetAddresses: _createJsonRpcRequestHandler(
+      async (
+        chainId: string,
+        address: string
+      ): Promise<IFormattedRpcResponse> => {
+        try {
+          const result = await client!.request<string[]>({
+            chainId,
+            topic: session!.topic,
+            request: {
+              method: DEFAULT_XMR_METHODS.XMR_GET_ADDRESSES,
+              params: {},
+            },
+          });
+
+          return {
+            method: DEFAULT_XMR_METHODS.XMR_GET_ADDRESSES,
+            address,
+            valid: true,
+            result: JSON.stringify(result, null, 2),
+          };
+        } catch (error: any) {
+          throw new Error(error.message);
+        }
+      }
+    ),
+    testSignTransaction: _createJsonRpcRequestHandler(
+      async (
+        chainId: string,
+        address: string
+      ): Promise<IFormattedRpcResponse> => {
+        try {
+          const address1 = chainId === "xmr:mainnet" ? "489BrGYiEjiMpgAFhoe5hZZTgKKtdPe3xeV1xYyrR8rJLKNwGfSxzJoBSDj4MUs8nVMBybiPhbfU4cRTm8pd2u696XHxV62" : "9xGZuCEjC4B2KGVrterGuKK6iskFP3RarWsjSNrY7F49dPq26gDJr2DgavcpqRxWh9UFUds64Lie5DfxR5BFwVVKDMCaTjW";
+          const address2 = chainId === "xmr:mainnet" ? "46FR1GKVqFNQnDiFkH7AuzbUBrGQwz2VdaXTDD4jcjRE8YkkoTYTmZ2Vohsz9gLSqkj5EM6ai9Q7sBoX4FPPYJdGKQQXPVz" : "9waNBpGwmoqBon2t1vAMFX3GPu2BHNSzPeGjFowLeadaidLLWKW3NUYGs8KXRMZuLQMeMTtufVxWiJvnQUAr1KAtPGAojsj";
+          const result = await client!.request<{ hash: string }>({
+            chainId,
+            topic: session!.topic,
+            request: {
+              method: DEFAULT_XMR_METHODS.XMR_SIGN_TRANSACTION,
+              params: JSON.parse(stringifyExtendedJson({
+                transaction: {
+                  destinations: [
+                    {
+                      address: address1,
+                      amount: BigInt(1e12),
+                    },
+                    {
+                      address: address2,
+                      amount: BigInt(1e12),
+                    },
+                  ],
+                  accountIndex: 0,
+                  relay: false,
+                },
+                userPrompt: "Sign this transaction",
+                broadcast: false,
+              })),
+            },
+          });
+
+          return {
+            method: DEFAULT_XMR_METHODS.XMR_SIGN_TRANSACTION,
+            address,
+            valid: true,
+            result: result.hash,
+          };
+        } catch (error: any) {
+          throw new Error(error.message);
+        }
+      }
+    ),
+    
+    testSignMessage: _createJsonRpcRequestHandler(
+      async (
+        chainId: string,
+        address: string
+      ): Promise<IFormattedRpcResponse> => {
+        const payload = "05010000004254";
+
+        try {
+          const result = await client!.request<string>({
+            chainId,
+            topic: session!.topic,
+            request: {
+              method: DEFAULT_XMR_METHODS.XMR_SIGN_MESSAGE,
+              params: {
+                address: address,
+                message: payload,
+              },
+            },
+          });
+          console.log(11, result)
+
+          return {
+            method: DEFAULT_XMR_METHODS.XMR_SIGN_MESSAGE,
+            address,
+            valid: true,
+            result: result,
+          };
+        } catch (error: any) {
+          throw new Error(error.message);
+        }
+      }
+    ),
+    
+    testGetBalance: _createJsonRpcRequestHandler(
+      async (
+        chainId: string,
+        address: string
+      ): Promise<IFormattedRpcResponse> => {
+        try {
+          const result = parseExtendedJson(JSON.stringify(await client!.request({
+            chainId,
+            topic: session!.topic,
+            request: {
+              method: DEFAULT_XMR_METHODS.XMR_GET_BALANCE,
+              params: {
+                address: address,
+              },
+            },
+          })));
+          console.log(11, result)
+
+          return {
+            method: DEFAULT_XMR_METHODS.XMR_GET_BALANCE,
+            address,
+            valid: true,
+            result: result.toString(),
+          };
+        } catch (error: any) {
+          throw new Error(error.message);
+        }
+      }
+    ),
+
+    testGetUnlockedBalance: _createJsonRpcRequestHandler(
+      async (
+        chainId: string,
+        address: string
+      ): Promise<IFormattedRpcResponse> => {
+        try {
+          const result = parseExtendedJson(JSON.stringify(await client!.request<bigint>({
+            chainId,
+            topic: session!.topic,
+            request: {
+              method: DEFAULT_XMR_METHODS.XMR_GET_UNLOCKED_BALANCE,
+              params: {
+                address: address,
+              },
+            },
+          })));
+
+          return {
+            method: DEFAULT_XMR_METHODS.XMR_GET_UNLOCKED_BALANCE,
+            address,
+            valid: true,
+            result: result.toString(),
+          };
+        } catch (error: any) {
+          throw new Error(error.message);
+        }
+      }
+    ),
+
+    testGetBalances: _createJsonRpcRequestHandler(
+      async (
+        chainId: string,
+        address: string
+      ): Promise<IFormattedRpcResponse> => {
+        try {
+          const result = parseExtendedJson(JSON.stringify(await client!.request({
+            chainId,
+            topic: session!.topic,
+            request: {
+              method: DEFAULT_XMR_METHODS.XMR_GET_BALANCES,
+              params: {
+                address: address,
+              },
+            },
+          })));
+          console.log(11, result)
+
+          console.log(result);
+          return {
+            method: DEFAULT_XMR_METHODS.XMR_GET_BALANCES,
+            address,
+            valid: true,
+            result: stringifyExtendedJson(result, 2),
+          };
+        } catch (error: any) {
+          throw new Error(error.message);
+        }
+      }
+    ),
+  };
+
   return (
     <JsonRpcContext.Provider
       value={{
@@ -1503,6 +1713,7 @@ export function JsonRpcContextProvider({
         tronRpc,
         tezosRpc,
         bchRpc,
+        xmrRpc,
         rpcResult: result,
         isRpcRequestPending: pending,
         isTestnet,

@@ -18,6 +18,8 @@ import {
   DEFAULT_TEZOS_EVENTS,
   DEFAULT_BCH_METHODS,
   DEFAULT_BCH_EVENTS,
+  DEFAULT_XMR_METHODS,
+  DEFAULT_XMR_EVENTS,
 } from "../constants";
 
 export const getNamespacesFromChains = (chains: string[]) => {
@@ -52,6 +54,8 @@ export const getSupportedMethodsByNamespace = (namespace: string) => {
       return Object.values(DEFAULT_TEZOS_METHODS);
     case "bch":
       return Object.values(DEFAULT_BCH_METHODS);
+    case "xmr":
+      return Object.values(DEFAULT_XMR_METHODS);
     default:
       throw new Error(`No default methods for namespace: ${namespace}`);
   }
@@ -77,6 +81,8 @@ export const getSupportedEventsByNamespace = (namespace: string) => {
       return Object.values(DEFAULT_TEZOS_EVENTS);
     case "bch":
       return Object.values(DEFAULT_BCH_EVENTS);
+    case "xmr":
+      return Object.values(DEFAULT_XMR_EVENTS);
     default:
       throw new Error(`No default events for namespace: ${namespace}`);
   }

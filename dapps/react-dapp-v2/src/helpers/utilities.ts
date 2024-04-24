@@ -230,3 +230,45 @@ export const getAllChainNamespaces = () => {
   });
   return namespaces;
 };
+
+// an extended json parser compatible with `stringify` from libauth
+export const parseExtendedJson = (jsonString: string) => {
+  const uint8ArrayRegex = /^<Uint8Array: 0x(?<hex>[0-9a-f]*)>$/u;
+  const bigIntRegex = /^<bigint: (?<bigint>[0-9]*)n>$/;
+
+  return JSON.parse(jsonString, (_key, value) => {
+    if (typeof value === "string") {
+      const bigintMatch = value.match(bigIntRegex);
+      if (bigintMatch) {
+        return BigInt(bigintMatch[1]);
+      }
+      const uint8ArrayMatch = value.match(uint8ArrayRegex);
+      if (uint8ArrayMatch) {
+        return encoding.hexToArray(uint8ArrayMatch[1]);
+      }
+    }
+    return value;
+  });
+}
+
+export const stringifyExtendedJson = (value: any, spacing = 2) =>
+  JSON.stringify(
+    value,
+    // eslint-disable-next-line complexity
+    (_, item: unknown) => {
+      const type = typeof item;
+      const name =
+        typeof item === 'object' && item !== null
+          ? item.constructor.name
+          : type;
+      switch (name) {
+        case 'Uint8Array':
+          return `<Uint8Array: 0x${encoding.arrayToHex(item as Uint8Array)}>`;
+        case 'bigint':
+          return `<bigint: ${(item as bigint).toString()}n>`;
+        default:
+          return item;
+      }
+    },
+    spacing
+  );

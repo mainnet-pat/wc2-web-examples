@@ -9,6 +9,7 @@ import * as elrond from "./elrond";
 import * as tron from "./tron";
 import * as tezos from "./tezos";
 import * as bch from "./bch";
+import * as xmr from "./xmr";
 
 import { ChainMetadata, ChainRequestRender } from "../helpers";
 
@@ -33,6 +34,8 @@ export function getChainMetadata(chainId: string): ChainMetadata {
       return tezos.getChainMetadata(chainId);
     case "bch":
       return bch.getChainMetadata(chainId);
+    case "xmr":
+      return xmr.getChainMetadata(chainId);
     default:
       throw new Error(`No metadata handler for namespace ${namespace}`);
   }

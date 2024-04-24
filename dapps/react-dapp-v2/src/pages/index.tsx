@@ -19,6 +19,7 @@ import {
   DEFAULT_TRON_METHODS,
   DEFAULT_TEZOS_METHODS,
   DEFAULT_BCH_METHODS,
+  DEFAULT_XMR_METHODS,
 } from "../constants";
 import { AccountAction, setLocaleStorageTestnetFlag } from "../helpers";
 import Toggle from "../components/Toggle";
@@ -79,6 +80,7 @@ const Home: NextPage = () => {
     tronRpc,
     tezosRpc,
     bchRpc,
+    xmrRpc,
     isRpcRequestPending,
     rpcResult,
     isTestnet,
@@ -123,14 +125,15 @@ const Home: NextPage = () => {
     //   chainId: "eip155:5",
     // });
 
-    const signature = await client!.request<string>({
-      topic: session!.topic,
-      chainId: "bch:mainnet",
-      request: {
-        method: "bch_sign", //DEFAULT_EIP155_METHODS.PERSONAL_SIGN,
-        params: ["asdf"],
-      },
-    });
+    // const signature = await client!.request<string>({
+    //   topic: session!.topic,
+    //   chainId: "xmr:mainnet",
+    //   request: {
+    //     method: "xmr_sign", //DEFAULT_EIP155_METHODS.PERSONAL_SIGN,
+    //     params: ["asdf"],
+    //   },
+    // });
+    alert('Not implemented');
   }
 
   const getEthereumActions = (): AccountAction[] => {
@@ -377,6 +380,59 @@ const Home: NextPage = () => {
     ];
   };
 
+  const getXmrActions = (): AccountAction[] => {
+    const onGetAccounts = async (chainId: string, address: string) => {
+      openRequestModal();
+      await xmrRpc.testGetAddresses(chainId, address);
+    };
+    const onSignTransaction = async (chainId: string, address: string) => {
+      openRequestModal();
+      await xmrRpc.testSignTransaction(chainId, address);
+    };
+    const onSignMessage = async (chainId: string, address: string) => {
+      openRequestModal();
+      await xmrRpc.testSignMessage(chainId, address);
+    };
+    const onGetBalance = async (chainId: string, address: string) => {
+      openRequestModal();
+      await xmrRpc.testGetBalance(chainId, address);
+    };
+    const onGetUnlockedBalance = async (chainId: string, address: string) => {
+      openRequestModal();
+      await xmrRpc.testGetUnlockedBalance(chainId, address);
+    };
+    const onGetBalances = async (chainId: string, address: string) => {
+      openRequestModal();
+      await xmrRpc.testGetBalances(chainId, address);
+    };
+    return [
+      {
+        method: DEFAULT_XMR_METHODS.XMR_GET_ADDRESSES,
+        callback: onGetAccounts,
+      },
+      {
+        method: DEFAULT_XMR_METHODS.XMR_SIGN_TRANSACTION,
+        callback: onSignTransaction,
+      },
+      {
+        method: DEFAULT_XMR_METHODS.XMR_SIGN_MESSAGE,
+        callback: onSignMessage,
+      },
+      {
+        method: DEFAULT_XMR_METHODS.XMR_GET_BALANCE,
+        callback: onGetBalance,
+      },
+      {
+        method: DEFAULT_XMR_METHODS.XMR_GET_UNLOCKED_BALANCE,
+        callback: onGetUnlockedBalance,
+      },
+      {
+        method: DEFAULT_XMR_METHODS.XMR_GET_BALANCES,
+        callback: onGetBalances,
+      },
+    ];
+  };
+
   const getBlockchainActions = (chainId: string) => {
     const [namespace] = chainId.split(":");
     switch (namespace) {
@@ -398,6 +454,8 @@ const Home: NextPage = () => {
         return getTezosActions();
       case "bch":
         return getBchActions();
+      case "xmr":
+        return getXmrActions();
       default:
         break;
     }

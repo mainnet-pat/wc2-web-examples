@@ -16,6 +16,7 @@ import { CosmosChainData } from "../chains/cosmos";
 import { EIP155ChainData } from "../chains/eip155";
 import { TezosChainData } from "../chains/tezos";
 import { BchChainData } from "../chains/bch";
+import { XmrChainData } from "../chains/xmr";
 
 /**
  * Types
@@ -72,6 +73,9 @@ export function ChainDataContextProvider({
             break;
           case "bch":
             chains = BchChainData;
+            break;
+          case "xmr":
+            chains = XmrChainData;
             break;
           default:
             console.error("Unknown chain namespace: ", namespace);
