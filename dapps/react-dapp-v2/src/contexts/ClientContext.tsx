@@ -58,15 +58,7 @@ const desktopWallets = {"xmr": [
       native: undefined as any,
       universal: "https://monujo.cash/#/wc"
     },
-  },
-  {
-    id: "Monujo Local",
-    name: "Monujo Local",
-    links: {
-      native: undefined as any,
-      universal: "http://localhost:9000/#/wc"
-    },
-  },
+  }
 ],
 "bch": [{
   id: "Cashonize",
